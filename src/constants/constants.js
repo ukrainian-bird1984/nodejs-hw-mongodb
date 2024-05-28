@@ -1,7 +1,7 @@
 export const ENV_VAR = {
-  PORT: 'PORT',
-  MONGODB_USER: 'MONGODB_USER',
-  MONGODB_PASSWORD: 'MONGODB_PASSWORD',
-  MONGODB_URL: 'MONGODB_URL',
-  MONGODB_DB: 'MONGODB_DB',
+  PORT: '3000',
+  MONGODB_USER: '<username>',
+  MONGODB_PASSWORD: '<password>',
+  MONGODB_URL: 'cluster0.pty0hdj.mongodb.net',
+  MONGODB_DB: 'https://cloud.mongodb.com/v2/664fac1f23d48806bdfd4e3f#/clusters',
 };
