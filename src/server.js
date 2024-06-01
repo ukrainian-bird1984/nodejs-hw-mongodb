@@ -1,61 +1,73 @@
 import express from 'express';
-import pino from 'pino-http';
 import cors from 'cors';
-import { env } from './utils/env.js';
-import { ENV_VAR } from './constants/constans.js';
+import pino from 'pino-http';
 import { notFoundMiddleware } from './middlewares/notFoundMiddleware.js';
-import { errorHandlerMiddleware } from './middlewares/errorHandlerMiddleware.js';
+import { env } from './utils/env.js';
 import { getAllContacts, getContactById } from './services/contacts.js';
+import mongoose from 'mongoose';
 
+const PORT = Number(env('PORT', '3000'));
 export const setupServer = () => {
   const app = express();
-
-  app.use(pino({ transport: { target: 'pino-pretty' } }));
-
   app.use(cors());
-
-  app.get('/contacts', async (req, res, next) => {
+  app.use(
+    pino({
+      transport: {
+        target: 'pino-pretty',
+      },
+    }),
+  );
+  app.get('/contacts', async (req, res) => {
     try {
       const contacts = await getAllContacts();
-      res.json({
+      res.status(200).json({
         status: 200,
         message: 'Successfully found contacts!',
         data: contacts,
       });
     } catch (error) {
-      next(error);
+      res.status(500).json({
+        status: 500,
+        message: 'Failed to retrieve contacts',
+        error: error.message,
+      });
     }
   });
-
-  app.get('/contacts/:contactId', async (req, res, next) => {
+  app.get('/contacts/:contactsId', async (req, res) => {
+    const contactId = req.params.contactsId;
     try {
-      const contactId = req.params.contactId;
+      if (!mongoose.isValidObjectId(contactId)) {
+        return res.status(404).json({
+          status: 404,
+          message: `Id ${contactId} is not valid`,
+        });
+      }
       const contact = await getContactById(contactId);
-
       if (!contact) {
         return res.status(404).json({
           status: 404,
           message: `Contact with id ${contactId} not found!`,
         });
-      } else {
-        return res.json({
-          status: 200,
-          message: `Successfully found contact with id ${contactId}!`,
-          data: contact,
-        });
       }
+      res.status(200).json({
+        status: 200,
+        message: `Successfully found contact with id ${contactId}!`,
+        data: contact,
+      });
     } catch (error) {
-      next(error);
+      res.status(404).json({
+        status: 500,
+        message: `Something went wrong!`,
+        error: error.message,
+      });
     }
   });
 
-  app.use('*', notFoundMiddleware);
-
-  app.use(errorHandlerMiddleware);
-
-  const PORT = env(ENV_VAR.PORT, 3000);
+  app.use(notFoundMiddleware);
 
   app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}!`);
   });
+
+  return app;
 };
