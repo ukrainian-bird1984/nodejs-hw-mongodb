@@ -5,6 +5,11 @@ import { env } from './utils/env.js';
 import contactsRouter from './routers/contacts.js';
 import createHttpError from 'http-errors';
 
+//
+import dotenv from "dotenv";
+dotenv.config();
+//
+
 const PORT = Number(env('PORT', '3000'));
 export const setupServer = () => {
   const app = express();
