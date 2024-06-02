@@ -4,6 +4,7 @@ import pino from 'pino-http';
 import { notFoundMiddleware } from './middlewares/notFoundMiddleware.js';
 import { env } from './utils/env.js';
 import contactsRouter from './routers/contacts.js';
+import createHttpError from 'http-errors';
 
 const PORT = Number(env('PORT', '3000'));
 export const setupServer = () => {
@@ -19,7 +20,15 @@ export const setupServer = () => {
 
   app.use(contactsRouter);
 
-  app.use(notFoundMiddleware);
+  app.use(notFoundMiddleware); 
+
+  app.use((err, req, res, next) => {
+    res.status(500).json({
+      status: 500,
+      message: 'Something went wrong',
+      data: err.message,
+    });
+  });
 
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}!`);
