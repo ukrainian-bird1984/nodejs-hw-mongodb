@@ -1,19 +1,20 @@
 import express from 'express';
-import cors from 'cors';
 import pino from 'pino-http';
-import { env } from './utils/env.js';
+import cors from 'cors';
 import contactsRouter from './routers/contacts.js';
-import createHttpError from 'http-errors';
+import { errorHandler } from './middlewares/errorHandler.js';
+import { notFoundHandler } from './middlewares/notFoundHandler.js';
 
-//
-import dotenv from "dotenv";
-dotenv.config();
-//
+import { env } from './utils/env.js';
 
 const PORT = Number(env('PORT', '3000'));
+
 export const setupServer = () => {
   const app = express();
+
+  app.use(express.json());
   app.use(cors());
+
   app.use(
     pino({
       transport: {
@@ -22,19 +23,17 @@ export const setupServer = () => {
     }),
   );
 
+  app.get('/', (req, res) => {
+    res.send('Hello World!');
+  });
+
   app.use(contactsRouter);
 
-  app.use((err, req, res, next) => {
-    res.status(500).json({
-      status: 500,
-      message: 'Something went wrong',
-      data: err.message,
-    });
-  });
+  app.use('*', notFoundHandler);
+
+  app.use(errorHandler);
 
   app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}!`);
+    console.log(`Server is running on port ${PORT}`);
   });
-
-  return app;
 };
