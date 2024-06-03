@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import createHttpError from 'http-errors'; 
 
 import { patchContact, createContact, getAllContacts, getContactById, deleteContact } from '../services/contacts.js';
