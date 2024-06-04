@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import pino from 'pino-http';
+<<<<<<< HEAD
 import { notFoundMiddleware } from './middlewares/notFoundMiddleware.js';
 import { env } from './utils/env.js';
 import { getAllContacts, getContactById } from './services/contacts.js';
@@ -11,6 +12,19 @@ const PORT = Number(env('PORT', '3000'));
 export const setupServer = () => {
   const app = express();
   app.use(cors());
+=======
+import { notFoundHandler } from './middlewares/notFoundHandler.js';
+import { env } from './utils/env.js';
+import { contactsRouter } from './routers/contacts.js';
+import { errorHandler } from './middlewares/errorHandler.js';
+
+const PORT = Number(env('PORT', '3000'));
+export const setupServer = () => {
+  const app = express();
+
+  app.use(cors());
+
+>>>>>>> 3ddb17fece38637224ec0c4fc70a44cab55f5385
   app.use(
     pino({
       transport: {
@@ -18,6 +32,7 @@ export const setupServer = () => {
       },
     }),
   );
+<<<<<<< HEAD
   app.get('/contacts', async (req, res) => {
     try {
       const contacts = await getAllContacts();
@@ -65,6 +80,21 @@ export const setupServer = () => {
   });
 
   app.use(notFoundMiddleware);
+=======
+
+  app.use(
+    express.json({
+      limit: '1mb',
+      type: ['application/json', 'application/vnd.api+json'],
+    }),
+  );
+
+  app.use(contactsRouter);
+
+  app.use(notFoundHandler);
+
+  app.use(errorHandler);
+>>>>>>> 3ddb17fece38637224ec0c4fc70a44cab55f5385
 
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}!`);
