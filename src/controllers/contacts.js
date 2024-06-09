@@ -13,7 +13,8 @@ import { parseSortParams } from '../utils/parseSortParams.js';
 export const getAllContactsController = async (req, res) => {
   try {
     const { page, perPage } = parsePaginationParams(req.query);
-    const contacts = await getAllContacts({ page, perPage });
+    **const { sortBy, sortOrder } = parseSortParams(req.query);**
+    const contacts = await getAllContacts({ page, perPage, **sortBy, sortOrder** });
 
     res.status(200).json({
       status: 200,
@@ -90,21 +91,20 @@ export const deleteContactController = async (req, res, next) => {
   res.sendStatus(204);
 };
 
-export const getContactsController = async (req, res) => {
+export const getAllContactsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
-
-  const { sortBy, sortOrder } = parseSortParams(req.query);
+  **const { sortBy, sortOrder } = parseSortParams(req.query);**
 
   const contacts = await getAllContacts({
     page,
     perPage,
-    sortBy,
-    sortOrder,
+    **sortBy,
+    sortOrder,**
   });
 
   res.json({
     status: 200,
-    message: 'Successfully found contact!',
+    message: 'Successfully found contacts!',
     data: contacts,
   });
 };

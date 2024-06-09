@@ -23,6 +23,7 @@ export const deleteContact = async (contactId) => {
   });
   return contact;
 };
+
 export const getAllContacts = async ({
   page = 1,
   perPage = 10,
@@ -40,7 +41,7 @@ export const getAllContacts = async ({
   const contacts = await contactsQuery
     .skip(skip)
     .limit(limit)
-    .sort({ [sortBy]: sortOrder })
+    **.sort({ [sortBy]: sortOrder })**  
     .exec();
 
   const paginationData = calculatePaginationData(contactsCount, perPage, page);
