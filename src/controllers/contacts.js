@@ -46,7 +46,7 @@ export const getContactByIdController = async (req, res, next) => {
     data: contact,
   });
 };
-// POST
+ 
 export const createContactController = async (req, res) => {
   const { body } = req;
   const contact = await createContact(body);
@@ -58,7 +58,6 @@ export const createContactController = async (req, res) => {
   });
 };
 
-// PATCH
 export const patchContactController = async (req, res, next) => {
   const contactId = req.params.contactsId;
   const { body } = req;
@@ -76,7 +75,6 @@ export const patchContactController = async (req, res, next) => {
   });
 };
 
-// DELETE
 export const deleteContactController = async (req, res, next) => {
   const contactId = req.params.contactsId;
   const contact = await deleteContact(contactId);

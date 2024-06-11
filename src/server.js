@@ -9,9 +9,7 @@ import { errorHandler } from './middlewares/errorHandler.js';
 const PORT = Number(env('PORT', '3000'));
 export const setupServer = () => {
   const app = express();
-
   app.use(cors());
-
   app.use(
     pino({
       transport: {
@@ -19,7 +17,6 @@ export const setupServer = () => {
       },
     }),
   );
-
   app.use(
     express.json({
       limit: '1mb',
