@@ -1,17 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-<<<<<<< HEAD
-
-import router from './routers/index.js';
-app.use(router);
-import { errorHandler } from './middlewares/errorHandler.js';
-=======
 import pino from 'pino-http';
->>>>>>> fae16317c877f2e20c63ba15b1c30f5979a3e170
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { env } from './utils/env.js';
-import { contactsRouter } from './routers/contacts.js';
+import router from './routers/index.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+
+app.use(router);
 
 const PORT = Number(env('PORT', '3000'));
 export const setupServer = () => {
