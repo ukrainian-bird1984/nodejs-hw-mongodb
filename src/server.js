@@ -5,6 +5,7 @@ import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { env } from './utils/env.js';
 import router from './routers/index.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import cookieParser from 'cookie-parser';
 
 app.use(router);
 
@@ -38,3 +39,5 @@ export const setupServer = () => {
 
   return app;
 };
+
+app.use(cookieParser());
