@@ -1,42 +1,53 @@
 import { Router } from 'express';
+
 import {
+  getContactsController,
+  getContactByIdController,
   createContactController,
   deleteContactController,
-  getAllContactsController,
-  getContactByIdController,
+  updateContactController,
   patchContactController,
-  getContactsController,
-  upsertContactController,
 } from '../controllers/contacts.js';
+
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
-import { validationBody } from '../middlewares/validateBody.js';
+
 import {
-  contactCreateValidationSchema,
-  contactUpdateValidationSchema,
-} from '../validation/contact.js';
+  createContactSchema,
+  updateContactSchema,
+} from '../validation/contacts.js';
+import { validateBody } from '../middlewares/validateBody.js';
+import { authenticate } from '../middlewares/authenticate.js';
 
 const router = Router();
 
-router.get('/', ctrlWrapper(getStudentsController));
+router.use(authenticate);
 
-router.get('/:contactId', ctrlWrapper(getContactByIdController));
+router.get('/', authenticate, ctrlWrapper(getContactsController));
+router.get('/:contactId', authenticate, ctrlWrapper(getContactByIdController));
 
 router.post(
-  '',
+  '/',
+  authenticate,
   validateBody(createContactSchema),
   ctrlWrapper(createContactController),
 );
 
-router.delete('/:contactId', ctrlWrapper(deleteContactController));
+router.delete(
+  '/:contactId',
+  authenticate,
+  ctrlWrapper(deleteContactController),
+);
 
 router.put(
   '/:contactId',
-  validateBody(createContactSchema),
-  ctrlWrapper(upsertContactController),
+  authenticate,
+  validateBody(updateContactSchema),
+  ctrlWrapper(updateContactController),
 );
 
 router.patch(
   '/:contactId',
+  authenticate,
   validateBody(updateContactSchema),
   ctrlWrapper(patchContactController),
 );

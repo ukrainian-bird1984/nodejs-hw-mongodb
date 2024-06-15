@@ -1,27 +1,23 @@
 import Joi from 'joi';
 
-export const contactCreateValidationSchema = Joi.object({
+export const createContactSchema = Joi.object({
   name: Joi.string().min(3).max(20).required().messages({
-    'string.base': 'Contact`s name should be a string',
-    'string.min': 'Contact`s name should have at least {#limit} characters',
-    'string.max': 'Contact`s name should have at most {#limit} characters',
-    'any.required': 'Contact`s name is required',
+    'string.empty': 'Set name for contact',
   }),
   phoneNumber: Joi.string().min(3).max(20).required().messages({
-    'string.base': 'Phone number should be a string',
-    'string.min': 'Phone number should have at least {#limit} characters',
-    'string.max': 'Phone number should have at most {#limit} characters',
-    'any.required': 'Phone number is required',
+    'string.empty': 'Set phone number for contact',
   }),
-  email: Joi.string().email().min(3).max(20),
-  isFavourite: Joi.boolean(),
-  contactType: Joi.string().valid('work', 'home', 'personal').required(),
+  email: Joi.string().email().min(3).max(20).optional(),
+  isFavorite: Joi.boolean().default(false),
+  contactType: Joi.string()
+    .valid('work', 'personal', 'home')
+    .default('personal'),
 });
 
-export const contactUpdateValidationSchema = Joi.object({
+export const updateContactSchema = Joi.object({
   name: Joi.string().min(3).max(20),
   phoneNumber: Joi.string().min(3).max(20),
   email: Joi.string().email().min(3).max(20),
-  isFavourite: Joi.boolean(),
-  contactType: Joi.string().valid('work', 'home', 'personal'),
+  isFavorite: Joi.boolean(),
+  contactType: Joi.string().valid('work', 'personal', 'home'),
 });
