@@ -4,7 +4,7 @@ import { UsersCollection } from '../db/models/user.js';
 import { loginUserSchema} from '../validation/auth.js';
 import { loginUserController } from '../controllers/auth.js';
 import { randomBytes } from 'crypto';
-import { FIFTEEN_MINUTES, ONE_DAY } from '../constants/index.js';
+import { FIFTEEN_MINUTES, ONE_DAY } from '../constants/constants.js';
 import { SessionsCollection } from '../db/models/session.js';
 
 export const registerUser = async (payload) => {

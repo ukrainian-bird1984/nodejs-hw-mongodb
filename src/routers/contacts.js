@@ -14,6 +14,7 @@ import {
   contactCreateValidationSchema,
   contactUpdateValidationSchema,
 } from '../validation/contact.js';
+
 const router = Router();
 
 router.get('/', ctrlWrapper(getStudentsController));

@@ -86,3 +86,24 @@ export const deleteContactController = async (req, res, next) => {
 
   res.sendStatus(204);
 };
+
+//???
+export const getContactsController = (req, res) => {
+    // Ваш код тут
+};
+///
+
+const contact = await createContact(req.body, req.user._id); 
+  res.status(201).json({
+    status: 201,
+    data: contact,
+    message: 'Successfully created contact!',
+  });
+}; src / services / contacts.js
+export const createContact = async (payload, userId) => {.                  
+  const contact = await ContactsCollection.create({
+    ...payload,
+    userId: userId,
+  });
+  return contact;
+};
