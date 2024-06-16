@@ -1,11 +1,10 @@
 import bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
-
 import createHttpError from 'http-errors';
-
 import { FIFTEEN_MINUTES, THIRTY_DAYS } from '../constants/index.js';
 import { UsersCollection } from '../db/models/user.js';
 import { SessionsCollection } from '../db/models/session.js';
+
 export const registerUser = async (payload) => {
   const existingUser = await UsersCollection.findOne({ email: payload.email });
   if (existingUser) {
@@ -53,21 +52,22 @@ export const loginUser = async (payload) => {
   });
 };
 
-export const logoutUser = async (sessionId) => {
-  await SessionsCollection.deleteOne({ _id: sessionId });
+export const logoutUser = async (sessionId, userId) => {
+  await SessionsCollection.findOneAndDelete({ _id: sessionId, userId: userId });
 };
 
-export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
+export const refreshUsersSession = async ({ sessionId, refreshToken, userId }) => {
   const session = await SessionsCollection.findOne({
     _id: sessionId,
     refreshToken,
+    userId: userId,
   });
 
   if (!session) {
     throw createHttpError(401, 'Session not found');
   }
 
-  await SessionsCollection.deleteOne({ _id: sessionId });
+  await SessionsCollection.findOneAndDelete({ _id: sessionId, userId: userId });
 
   const isSessionTokenExpired =
     new Date() > new Date(session.refreshTokenValidUntil);
