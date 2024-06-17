@@ -83,3 +83,14 @@ export const refreshUsersSession = async ({ sessionId, refreshToken, userId }) =
     ...newSession,
   });
 };
+
+
+//2 створимо сервісну функцію
+export const requestResetToken = async (email) => {
+  const user = await UsersCollection.findOne({ email });
+  if (!user) {
+    throw createHttpError(404, 'User not found');
+  }
+ 
+ //доповнимо її трохи пізніше
+};
