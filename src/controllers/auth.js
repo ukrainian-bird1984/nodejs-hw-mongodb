@@ -3,8 +3,8 @@ import {
   loginUser,
   logoutUser,
   refreshUsersSession,
+  resetPassword,
 } from '../services/auth.js';
-
 import { THIRTY_DAYS } from '../constants/index.js';
 
 export const registerUserController = async (req, res) => {
@@ -67,7 +67,6 @@ export const logoutUserController = async (req, res) => {
   res.status(204).send();
 };
 
-//3 контролер, який буде обробляти запит на зміну пароля
 import { requestResetToken } from '../services/auth.js';
 
 export const requestResetEmailController = async (req, res) => {
@@ -78,3 +77,13 @@ export const requestResetEmailController = async (req, res) => {
     data: {},
   });
 };
+
+export const resetPasswordController = async (req, res) => {
+  await resetPassword(req.body);
+  res.json({
+    message: 'Password was successfully reset!',
+    status: 200,
+    data: {},
+  });
+};
+
