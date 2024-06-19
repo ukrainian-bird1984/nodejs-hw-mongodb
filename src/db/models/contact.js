@@ -41,4 +41,16 @@ const Contact = new Schema({
   },
 });
 
-export const ContactsCollection = model('contacts', Contact);
+const contactsSchema = new Schema(
+  {
+    /* Інший код файлу */
+    
+    photo: { type: String },
+  },
+  {
+    timestamps: true,
+    versionKey: false,
+  },
+);
+
+export const ContactsCollection = model('contacts', contactsSchema, Contact);
