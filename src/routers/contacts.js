@@ -29,9 +29,9 @@ router.post(
   validateBody(createContactSchema),
   ctrlWrapper(createContactController),
   checkRoles(ROLES.TEACHER),
-  validateBody(createStudentSchema),
+  validateBody(createContactSchema),
   upload.single('photo'),
-  ctrlWrapper(createStudentController),
+  ctrlWrapper(createContactController),
 );
 
 router.delete(
