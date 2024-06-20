@@ -124,7 +124,7 @@ export const patchContactController = async (req, res, next) => {
     }
   }
 
-  const result = await updateStudent(studentId, {
+  const result = await updateContact(contactId, {
     ...req.body,
     photo: photoUrl,
   });
