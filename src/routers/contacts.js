@@ -1,4 +1,5 @@
 import { Router } from 'express';
+
 import {
   getContactsController,
   getContactByIdController,
@@ -7,7 +8,9 @@ import {
   updateContactController,
   patchContactController,
 } from '../controllers/contacts.js';
+
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
+
 import {
   createContactSchema,
   updateContactSchema,
@@ -21,16 +24,13 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/', authenticate, ctrlWrapper(getContactsController));
-router.get('/:contactId', authenticate, ctrlWrapper(getContactByIdController));
+router.get('/:contactId', ctrlWrapper(getContactByIdController));
 
 router.post(
   '/',
   authenticate,
-  validateBody(createContactSchema),
-  ctrlWrapper(createContactController),
-  checkRoles(ROLES.TEACHER),
-  validateBody(createContactSchema),
   upload.single('photo'),
+  validateBody(createContactSchema),
   ctrlWrapper(createContactController),
 );
 
@@ -43,23 +43,17 @@ router.delete(
 router.put(
   '/:contactId',
   authenticate,
+  upload.single('photo'),
   validateBody(updateContactSchema),
   ctrlWrapper(updateContactController),
-  checkRoles(ROLES.TEACHER),
-  validateBody(createStudentSchema),
-  upload.single('photo'),
-  ctrlWrapper(upsertStudentController),
 );
 
 router.patch(
   '/:contactId',
   authenticate,
+  upload.single('photo'),
   validateBody(updateContactSchema),
   ctrlWrapper(patchContactController),
-  checkRoles(ROLES.TEACHER, ROLES.PARENT),
-  validateBody(updateStudentSchema),
-  upload.single('photo'),
-  ctrlWrapper(patchStudentController),
 );
 
 export default router;

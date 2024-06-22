@@ -1,4 +1,3 @@
-//6 Функціонал надсилання листів потрібно винести в окрему функцію-утіліту sendMail
 import nodemailer from 'nodemailer';
 import { SMTP } from '../constants/index.js';
 import { env } from '../utils/env.js';

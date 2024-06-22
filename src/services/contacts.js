@@ -49,23 +49,22 @@ export const createContact = async (payload) => {
   return contact;
 };
 
-export const deleteContact = async (contactId, userId) => {
+export const deleteContact = async (authContactId) => {
   const contact = await ContactsCollection.findOneAndDelete({
-    _id: contactId,
-    userId: userId,
+    _id: authContactId,
   });
   return contact;
 };
 
-export const updateContact = async (contactId, userId, payload, options = {}) => {
+export const updateContact = async (authContactId, payload, options = {}) => {
   const rawResult = await ContactsCollection.findOneAndUpdate(
-    { _id: contactId, userId: userId },
+    { _id: authContactId },
     payload,
     {
       new: true,
       includeResultMetadata: true,
       ...options,
-    }
+    },
   );
   if (!rawResult || !rawResult.value) {
     return null;

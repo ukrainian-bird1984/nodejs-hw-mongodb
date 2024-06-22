@@ -1,15 +1,22 @@
 import { Router } from 'express';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { validateBody } from '../middlewares/validateBody.js';
-/////import { registerUserSchema, loginUserSchema, requestResetEmailSchema, resetPasswordSchema } from '../validation/auth.js';
+import {
+  registerUserSchema,
+  loginUserSchema,
+  sendResetEmailSchema,
+  resetPasswordSchema,
+} from '../validation/auth.js';
+
 import {
   registerUserController,
   loginUserController,
   logoutUserController,
   refreshUserSessionController,
-  requestResetEmailController,
-  resetPasswordController
+  sendResetEmailController,
+  resetPasswordController,
 } from '../controllers/auth.js';
+
 import { authenticate } from '../middlewares/authenticate.js';
 
 const router = Router();
@@ -35,9 +42,9 @@ router.post(
 router.post('/logout', authenticate, ctrlWrapper(logoutUserController));
 
 router.post(
-  '/request-reset-email',
-  validateBody(requestResetEmailSchema),
-  ctrlWrapper(requestResetEmailController),
+  '/send-reset-email',
+  validateBody(sendResetEmailSchema),
+  ctrlWrapper(sendResetEmailController),
 );
 
 router.post(
