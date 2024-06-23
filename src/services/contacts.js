@@ -1,29 +1,30 @@
-import { ContactsCollection } from '../db/models/contacts.js';
+import { SORT_ORDER } from '../constants/constants.js';
+import { Contacts } from '../db/contact.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
-import { SORT_ORDER } from '../constants/index.js';
 
 export const getAllContacts = async ({
   page = 1,
   perPage = 10,
-  sortBy = '_id',
+  sortBy = 'name',
   sortOrder = SORT_ORDER.ASC,
   filter = {},
+  userId,
 }) => {
   const limit = perPage;
-  const skip = (page - 1) * perPage;
+  const skip = perPage * (page - 1);
+  const contactsQuery = Contacts.find();
 
-  const contactsQuery = ContactsCollection.find();
-
-  if (filter.contactType) {
-    contactsQuery.where('contactType').equals(filter.contactType);
+  if (filter.type) {
+    contactsQuery.where('contactType').equals(filter.type);
+  }
+  if (typeof filter.isFavourite !== 'undefined') {
+    contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
 
-  if (filter.isFavorite) {
-    contactsQuery.where('isFavorite').equals(filter.isFavorite);
-  }
+  contactsQuery.where('userId').equals(userId);
 
   const [contactsCount, contacts] = await Promise.all([
-    ContactsCollection.find().merge(contactsQuery).countDocuments(),
+    Contacts.find().merge(contactsQuery).countDocuments(),
     contactsQuery
       .skip(skip)
       .limit(limit)
@@ -31,34 +32,31 @@ export const getAllContacts = async ({
       .exec(),
   ]);
 
-  const paginationData = calculatePaginationData(contactsCount, perPage, page);
+  const paginationData = calculatePaginationData(contactsCount, page, perPage);
 
-  return {
-    data: contacts,
-    ...paginationData,
-  };
+  return { data: contacts, ...paginationData };
 };
 
-export const getContactById = async (payload) => {
-  const contact = await ContactsCollection.findOne(payload);
-  return contact;
-};
-
-export const createContact = async (payload) => {
-  const contact = await ContactsCollection.create(payload);
-  return contact;
-};
-
-export const deleteContact = async (authContactId) => {
-  const contact = await ContactsCollection.findOneAndDelete({
-    _id: authContactId,
+export const getContactById = async (id, userId) => {
+  return await Contacts.findOne({
+    _id: id,
+    userId,
   });
+};
+
+export const createContact = async (payload, userId) => {
+  const contact = await Contacts.create({ ...payload, userId });
   return contact;
 };
 
-export const updateContact = async (authContactId, payload, options = {}) => {
-  const rawResult = await ContactsCollection.findOneAndUpdate(
-    { _id: authContactId },
+export const updateContact = async (
+  contactId,
+  payload,
+  userId,
+  options = {},
+) => {
+  const rawResult = await Contacts.findOneAndUpdate(
+    { _id: contactId, userId },
     payload,
     {
       new: true,
@@ -66,11 +64,19 @@ export const updateContact = async (authContactId, payload, options = {}) => {
       ...options,
     },
   );
-  if (!rawResult || !rawResult.value) {
-    return null;
-  }
+  if (!rawResult || !rawResult.value) return null;
+
   return {
-    contact: rawResult,
+    contact: rawResult.value,
     isNew: Boolean(rawResult?.lastErrorObject?.upserted),
   };
+};
+
+export const deleteContact = async (contactId, userId) => {
+  const contact = await Contacts.findOneAndDelete({
+    _id: contactId,
+    userId,
+  });
+
+  return contact;
 };
