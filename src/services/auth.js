@@ -13,8 +13,8 @@ import fs from 'node:fs/promises';
 import bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import createHttpError from 'http-errors';
-import { UsersCollection } from '../db/models/user.js';
-import { SessionsCollection } from '../db/models/session.js';
+import { UsersCollection } from '../db/models/users.js';
+import { SessionsCollection } from '../db/models/sessions.js';
 
 export const registerUser = async (payload) => {
   const existingUser = await UsersCollection.findOne({ email: payload.email });
