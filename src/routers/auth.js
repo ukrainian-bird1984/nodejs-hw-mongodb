@@ -1,28 +1,28 @@
 import { Router } from 'express';
-import { validateBody } from '../middlewares/validateBody.js';
-import { ctrlWrapper } from '../utils/ctrlWrapper.js';
-import { registerUserSchema } from '../validation/registerUserSchema.js';
+import ctrlWrapper from '../utils/ctrlWrapper.js';
+import validateBody from '../middlewares/validateBody.js';
+import {
+  loginUserSchema,
+  registerUserSchema,
+  resetPasswordSchema,
+  sendResetEmailSchema,
+} from '../validation/schemas/auth.js';
 import {
   loginUserController,
-  logoutController,
-  refreshUserSessionController,
-  registerUserController,
-  requestResetEmailController,
+  logoutUserController,
+  refreshUsersSessionController,
+  registerUserContoller,
   resetPasswordController,
+  sendResetEmailController,
 } from '../controllers/auth.js';
-import { loginUserSchema } from '../validation/loginUserSchema.js';
-import { authenticate } from '../middlewares/authenticate.js';
-import { requestResetEmailSchema } from '../validation/requestResetEmailSchema.js';
-import { resetPasswordSchema } from '../validation/resetPasswordSchema.js';
-const authRouter = Router();
+import authenticate from '../middlewares/authenticate.js';
 
-authRouter.use('/logout', authenticate);
-authRouter.use('/refresh', authenticate);
+const authRouter = Router();
 
 authRouter.post(
   '/register',
   validateBody(registerUserSchema),
-  ctrlWrapper(registerUserController),
+  ctrlWrapper(registerUserContoller),
 );
 
 authRouter.post(
@@ -31,14 +31,18 @@ authRouter.post(
   ctrlWrapper(loginUserController),
 );
 
-authRouter.post('/logout', ctrlWrapper(logoutController));
+authRouter.post(
+  '/refresh',
+  authenticate,
+  ctrlWrapper(refreshUsersSessionController),
+);
 
-authRouter.post('/refresh', ctrlWrapper(refreshUserSessionController));
+authRouter.post('/logout', authenticate, ctrlWrapper(logoutUserController));
 
 authRouter.post(
   '/send-reset-email',
-  validateBody(requestResetEmailSchema),
-  ctrlWrapper(requestResetEmailController),
+  validateBody(sendResetEmailSchema),
+  ctrlWrapper(sendResetEmailController),
 );
 
 authRouter.post(
