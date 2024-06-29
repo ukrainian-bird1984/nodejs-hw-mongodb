@@ -1,18 +1,23 @@
 import express from 'express';
-import cors from 'cors';
 import pino from 'pino-http';
-import env from './utils/env.js';
-import { ENV_VARS } from './constants/envVars.js';
-import rootRouter from './routers/index.js';
-import notFoundHandler from './middlewares/notFoundHandler.js';
-import errorHandler from './middlewares/errorHandler.js';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { notFoundHandler } from './middlewares/notFoundHandler.js';
+import { errorHandler } from './middlewares/errorHandler.js';
+import router from './routers/index.js';
 import cookieParser from 'cookie-parser';
-import { UPLOADS_DIR } from './constants/index.js';
-import removeFileIfExists from './middlewares/removeFileIfExists.js';
+import { UPLOAD_DIR } from './constants/index.js';
 
-export default function setupServer() {
-  const PORT = Number(env(ENV_VARS.PORT, 3000));
+dotenv.config();
+
+const PORT = Number(process.env.PORT);
+
+export const setupServer = () => {
   const app = express();
+
+  app.use(express.json());
+
+  app.use(cors());
 
   app.use(
     pino({
@@ -24,21 +29,21 @@ export default function setupServer() {
 
   app.use(cookieParser());
 
-  app.use(cors());
+  app.get('/', (req, res) => {
+    res.json({
+      message: 'Hello user!',
+    });
+  });
 
-  app.use(express.json());
+  app.use(router);
 
-  app.use('/uploads', express.static(UPLOADS_DIR));
-
-  app.use(rootRouter);
+  app.use('/uploads', express.static(UPLOAD_DIR));
 
   app.use('*', notFoundHandler);
-
-  app.use(removeFileIfExists);
 
   app.use(errorHandler);
 
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
-}
+};

@@ -1,17 +1,15 @@
-import fs from 'node:fs/promises';
-import { v2 as cloudinary } from 'cloudinary';
-import env from './env.js';
-import { ENV_VARS } from '../constants/envVars.js';
+import cloudinary from 'cloudinary';
+import { env } from './env.js';
+import { CLOUDINARY } from '../constants/index.js';
 
-cloudinary.config({
+cloudinary.v2.config({
   secure: true,
-  cloud_name: env(ENV_VARS.CLOUDINARY_CLOUD_NAME),
-  api_key: env(ENV_VARS.CLOUDINARY_API_KEY),
-  api_secret: env(ENV_VARS.CLOUDINARY_API_SECRET),
+  cloud_name: env(CLOUDINARY.CLOUD_NAME),
+  api_key: env(CLOUDINARY.API_KEY),
+  api_secret: env(CLOUDINARY.API_SECRET),
 });
 
-export default async function saveFileToCloudinary(file) {
-  const response = await cloudinary.uploader.upload(file.path);
-  fs.unlink(file.path);
-  return response.secure_url;
-}
+export const saveFileToCloudinary = async (file) => {
+    const responce = await cloudinary.v2.uploader.upload(file.path);
+    return responce.secure_url;
+};
