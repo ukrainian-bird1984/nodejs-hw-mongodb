@@ -1,5 +1,5 @@
 import cloudinary from 'cloudinary';
-import env from './env.js';
+import { env } from './env.js';
 import { CLOUDINARY } from '../constants/index.js';
 
 cloudinary.v2.config({
@@ -10,6 +10,6 @@ cloudinary.v2.config({
 });
 
 export const saveFileToCloudinary = async (file) => {
-    const response = await cloudinary.v2.uploader.upload(file.path);
-    return response.secure_url;
+    const responce = await cloudinary.v2.uploader.upload(file.path);
+    return responce.secure_url;
 };

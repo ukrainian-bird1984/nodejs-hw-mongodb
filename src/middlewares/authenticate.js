@@ -1,6 +1,6 @@
 import createHttpError from 'http-errors';
-import { Session } from '../db/models/session.js'; // змінено з SessionCollection на Session
-import { User } from '../db/models/user.js'; // змінено з UsersCollection на User
+import { SessionCollection } from '../db/models/session.js';
+import { UsersCollection } from '../db/models/user.js';
 
 export const authenticate = async (req, res, next) => {
   const authHeader = req.get('Authorization');
@@ -20,31 +20,27 @@ export const authenticate = async (req, res, next) => {
     return;
   }
 
-  try {
-    const session = await Session.findOne({
-      accessToken: token
+    const session = await SessionCollection.findOne({
+        accessToken: token
     });
 
     if (!session) {
-      next(createHttpError(401, 'Session not found'));
-      return;
+        next(createHttpError(401, 'Session not found'));
+        return;
     }
 
     const isSessionTokenExpired = new Date() > new Date(session.accessTokenValidUntil);
     if (isSessionTokenExpired) {
-      next(createHttpError(401, 'Access token expired'));
-      return;
+        next(createHttpError(401, 'Access token expired'));
+        return;
     }
 
-    const user = await User.findById(session.userId);
+    const user = await  UsersCollection.findById(session.userId);
     if (!user) {
-      next(createHttpError(401));
-      return;
+        next(createHttpError(401));
+        return;
     }
 
     req.user = user;
     next();
-  } catch (error) {
-    next(error); // пересилаємо помилку в обробник помилок Express
-  }
 };

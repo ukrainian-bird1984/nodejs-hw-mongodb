@@ -13,7 +13,7 @@ import {
   THIRTY_DAY,
   SMTP,
 } from '../constants/index.js';
-import env from '../utils/env.js';
+import { env } from '../utils/env.js';
 import { sendEmail } from '../utils/sendMail.js';
 
 export const registerUser = async (payload) => {
