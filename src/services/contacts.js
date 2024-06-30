@@ -13,9 +13,11 @@ export const getAllContacts = async ({
   const limit = perPage;
   const skip = (page - 1) * perPage;
   const contactsQuery = ContactsCollection.find({ userId });
+
   if (filter.isFavourite) {
     contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
+
   if (filter.contactType) {
     contactsQuery.where('contactType').equals(filter.contactType);
   }
@@ -28,11 +30,13 @@ export const getAllContacts = async ({
       .sort({ [sortBy]: sortOrder })
       .exec(),
   ]);
+
   const paginationData = calculatePaginationData(
     contactsCount,
     page,
     perPage,
   );
+
   return {
     data: contacts,
     ...paginationData,
@@ -44,6 +48,7 @@ export const getContactById = async (userId, contactId) => {
     _id: contactId,
     userId,
   });
+
   return contact;
 };
 
@@ -58,6 +63,7 @@ export const patchContact = async (userId, contactId, payload) => {
     payload,
     { new: true },
   );
+
   return contact;
 };
 
@@ -66,5 +72,6 @@ export const deleteContact = async (userId, contactId) => {
     _id: contactId,
     userId,
   });
+  
   return contact;
 };

@@ -1,8 +1,5 @@
 import createHttpError from 'http-errors';
-///
-import { SessionCollection } from '../../db/models/session.js';
-///
-
+import { SessionCollection } from '../db/models/session.js';
 import { UsersCollection } from '../db/models/user.js';
 
 export const authenticate = async (req, res, next) => {
@@ -14,6 +11,7 @@ export const authenticate = async (req, res, next) => {
   }
 
   const bearer = authHeader.split(' ')[0];
+  
   const token = authHeader.split(' ')[1];
 
   if (bearer !== 'Bearer' || !token) {

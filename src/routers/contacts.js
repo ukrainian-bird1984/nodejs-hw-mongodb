@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
+
 import {
   createContactController,
   deleteContactController,
@@ -7,12 +8,16 @@ import {
   getContactByIdController,
   patchContactController,
 } from '../controllers/contacts.js';
+
 import { validateBody } from '../middlewares/validateBody.js';
+
 import {
   createContactSchema,
   updateContactSchema,
+
 } from '../validation/validateSchema.js';
 import { authenticate } from '../middlewares/authenticate.js';
+
 import { upload } from '../middlewares/multer.js';
 
 const router = Router();

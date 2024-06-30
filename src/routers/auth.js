@@ -6,7 +6,9 @@ import {
   resetEmailSchema,
   resetPasswordSchema,
 } from '../validation/authValidateSchema.js';
+
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
+
 import {
   loginUserController,
   logoutUserController,
@@ -31,7 +33,6 @@ router.post(
 );
 
 router.post('/logout', ctrlWrapper(logoutUserController));
-
 router.post('/refresh', ctrlWrapper(refreshUserSessionController));
 
 router.post(
