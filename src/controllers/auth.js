@@ -24,6 +24,7 @@ export const loginUserController = async (req, res) => {
     httpOnly: true,
     expires: new Date(Date.now() + THIRTY_DAY),
   });
+
   res.cookie('sessionId', session._id, {
     httpOnly: true,
     expires: new Date(Date.now() + THIRTY_DAY),
@@ -45,16 +46,19 @@ export const logoutUserController = async (req, res) => {
   });
 
   res.clearCookie('sessionId');
+
   res.clearCookie('refreshToken');
 
   res.status(204).send();
 };
 
 const setupSession = (res, session) => {
+
   res.cookie('refreshToken', session.refreshToken, {
     httpOnly: true,
     expires: new Date(Date.now() + THIRTY_DAY),
   });
+
   res.cookie('sessionId', session._id, {
     httpOnly: true,
     expires: new Date(Date.now() + THIRTY_DAY),
@@ -66,6 +70,7 @@ export const refreshUserSessionController = async (req, res) => {
          sessionId: req.cookies.sessionId,
          refreshToken: req.cookies.refreshToken,
      });
+
     setupSession(res, session);
 
     res.json({
@@ -77,6 +82,7 @@ export const refreshUserSessionController = async (req, res) => {
 
 export const resetTokenController = async (req, res) => {
   await resetToken(req.body.email);
+
   res.json({
   status: 200,
     message: 'Reset password email has been successfully sent.',
@@ -86,6 +92,7 @@ export const resetTokenController = async (req, res) => {
 
 export const resetPasswordController = async (req, res) => {
   await resetPassword(req.body);
+  
   res.json({
     status: 200,
     message: 'Password has been successfully reset.',
