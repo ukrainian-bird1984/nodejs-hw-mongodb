@@ -4,7 +4,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node ./src/index.js"
+    "start": "node ./src/index.js",
+    "dev": "npm run start"
   },
   "keywords": [],
   "author": "",
@@ -13,8 +14,7 @@
   "devDependencies": {
     "@eslint/js": "^9.3.0",
     "eslint": "^9.3.0",
-    "globals": "^15.3.0",
-    "dev": "npm run start"
+    "globals": "^15.3.0"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
