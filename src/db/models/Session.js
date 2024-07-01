@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose';
 
+console.log("Before defining schema");
 const sessionsSchema = new Schema(
   {
     userId: {
@@ -27,4 +28,6 @@ const sessionsSchema = new Schema(
   { timestamps: true, versionKey: false },
 );
 
+console.log("Before exporting session collection");
 export const SessionCollection = model('sessions', sessionsSchema);
+console.log("After exporting session collection");
