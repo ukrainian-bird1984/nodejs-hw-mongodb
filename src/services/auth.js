@@ -1,50 +1,53 @@
-import createHttpError from 'http-errors';
-import { UsersCollection } from '../db/models/users.js';
 import bcrypt from 'bcrypt';
-import { SessionsCollections } from '../db/models/sessions.js';
-import { createSession } from '../utils/createSession.js';
 import jwt from 'jsonwebtoken';
+import { UsersCollection } from '../db/models/user.js';
+import createHttpError from 'http-errors';
+import { SessionsCollection } from '../db/models/session.js';
+import { randomBytes } from 'crypto';
+import { FIFTEEN_MINUTES, ONE_MOUNTH } from '../constants/constants.js';
+import { createSession } from '../utils/createSession.js';
 import { env } from '../utils/env.js';
-import { ENV_VARS } from '../constants/constans.js';
-import { sendMail } from '../utils/sendMail.js';
-import handlebars from 'handlebars';
-import path from 'node:path';
-import fs from 'node:fs/promises';
+import { sendEmail } from '../utils/sendMail.js';
 
 export const registerUser = async (payload) => {
   const user = await UsersCollection.findOne({ email: payload.email });
-  if (user) {
-    throw createHttpError(409, 'Email in use');
-  }
+  if (user) throw createHttpError(409, 'Email in use');
 
-  const hashedPassword = await bcrypt.hash(payload.password, 10);
+  const encryptedPassword = await bcrypt.hash(payload.password, 10);
+
   return await UsersCollection.create({
     ...payload,
-    password: hashedPassword,
+    password: encryptedPassword,
   });
 };
 
 export const loginUser = async (payload) => {
   const user = await UsersCollection.findOne({ email: payload.email });
-
   if (!user) {
     throw createHttpError(404, 'User not found');
   }
 
   const isEqual = await bcrypt.compare(payload.password, user.password);
+  if (!isEqual) {
+    throw createHttpError(401, 'Unauthorized');
+  }
 
-  if (!isEqual) throw createHttpError(401, 'Unauthorized');
+  await SessionsCollection.deleteOne({ userId: user._id });
 
-  await SessionsCollections.deleteOne({ userId: user._id });
+  const accessToken = randomBytes(30).toString('base64');
+  const refreshToken = randomBytes(30).toString('base64');
 
-  return await SessionsCollections.create({
+  return await SessionsCollection.create({
     userId: user._id,
-    ...createSession(),
+    accessToken,
+    refreshToken,
+    accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
+    refreshTokenValidUntil: new Date(Date.now() + ONE_MOUNTH),
   });
 };
 
-export const refreshSession = async ({ sessionId, refreshToken }) => {
-  const session = await SessionsCollections.findOne({
+export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
+  const session = await SessionsCollection.findOne({
     _id: sessionId,
     refreshToken,
   });
@@ -60,26 +63,24 @@ export const refreshSession = async ({ sessionId, refreshToken }) => {
     throw createHttpError(401, 'Session token expired');
   }
 
-  await SessionsCollections.deleteOne({ _id: sessionId });
+  const newSession = createSession();
 
-  return await SessionsCollections.create({
+  await SessionsCollection.deleteOne({ _id: sessionId, refreshToken });
+
+  return await SessionsCollection.create({
     userId: session.userId,
-    ...createSession(),
+    ...newSession,
   });
 };
 
-export const logoutUser = async ({ sessionId, refreshToken }) => {
-  return await SessionsCollections.deleteOne({
-    _id: sessionId,
-    refreshToken,
-  });
+export const logoutUser = async (sessionId) => {
+  await SessionsCollection.deleteOne({ _id: sessionId });
 };
 
 export const requestResetToken = async (email) => {
   const user = await UsersCollection.findOne({ email });
-
   if (!user) {
-    throw createHttpError(404, 'User not found!');
+    throw createHttpError(404, 'User not found');
   }
 
   const resetToken = jwt.sign(
@@ -87,40 +88,21 @@ export const requestResetToken = async (email) => {
       sub: user._id,
       email,
     },
-    env(ENV_VARS.JWT_SECRET),
+    env('JWT_SECRET'),
     {
       expiresIn: '5m',
     },
   );
-
-  const resetPasswordTemplatePath = path.join(
-    process.cwd(),
-    'src',
-    'templates',
-    'reset-password-email.html',
-  );
-
-  const templateSourse = (
-    await fs.readFile(resetPasswordTemplatePath)
-  ).toString();
-
-  const template = handlebars.compile(templateSourse);
-
-  const html = template({
-    name: user.name,
-    link: `${env(ENV_VARS.APP_DOMAIN)}/reset-password?token=${resetToken}`,
-  });
-
   try {
-    await sendMail({
-      from: env(ENV_VARS.SMTP_FROM),
+    await sendEmail({
+      from: env('SMTP_FROM'),
       to: email,
       subject: 'Reset your password',
-      html,
+      html: `<p>Click <a href="${env(
+        'APP_DOMAIN',
+      )}auth/reset-pwd?token=${resetToken}">here</a> to reset your password!</p>`,
     });
-  } catch (error) {
-    console.log(error);
-
+  } catch (err) {
     throw createHttpError(
       500,
       'Failed to send the email, please try again later.',
@@ -128,26 +110,28 @@ export const requestResetToken = async (email) => {
   }
 };
 
-export const resetPassword = async ({ token, password }) => {
-  let verifedToken;
+export const resetPassword = async (payload) => {
+  let entries;
+
   try {
-    verifedToken = jwt.verify(token, env(ENV_VARS.JWT_SECRET));
-  } catch (error) {
-    if (error instanceof Error) {
-      throw createHttpError(401, 'Token is expired or invalid.');
-    }
-    throw error;
+    entries = jwt.verify(payload.token, env('JWT_SECRET'));
+  } catch (err) {
+    throw createHttpError(401, 'Token is expired or invalid.');
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = await UsersCollection.findOne({
+    _id: entries.sub,
+    email: entries.email,
+  });
 
-  const user = await UsersCollection.findOneAndUpdate(
-    {
-      _id: verifedToken.sub,
-      email: verifedToken.email,
-    },
-    { password: hashedPassword },
+  if (!user) {
+    throw createHttpError(404, 'User not found');
+  }
+
+  const encryptedPassword = await bcrypt.hash(payload.password, 10);
+
+  await UsersCollection.updateOne(
+    { _id: user._id },
+    { password: encryptedPassword },
   );
-
-  if (!user) throw createHttpError(404, 'User not found!');
 };

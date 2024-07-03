@@ -1,16 +1,14 @@
-import { TIME_FOR_TOKEN } from '../constants/constans.js';
-import crypto from 'crypto';
+import { randomBytes } from 'crypto';
+import { FIFTEEN_MINUTES, ONE_MOUNTH } from '../constants/constants.js';
 
 export const createSession = () => {
-  const accessToken = crypto.randomBytes(20).toString('base64');
-  const refreshToken = crypto.randomBytes(20).toString('base64');
+  const accessToken = randomBytes(30).toString('base64');
+  const refreshToken = randomBytes(30).toString('base64');
 
   return {
     accessToken,
     refreshToken,
-    accessTokenValidUntil: new Date(
-      Date.now() + TIME_FOR_TOKEN.FIFTEEN_MINUTES,
-    ),
-    refreshTokenValidUntil: new Date(Date.now() + TIME_FOR_TOKEN.THIRTY_DAYS),
+    accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
+    refreshTokenValidUntil: new Date(Date.now() + ONE_MOUNTH),
   };
 };

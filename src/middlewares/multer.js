@@ -1,5 +1,5 @@
 import multer from 'multer';
-import { TEMP_UPLOAD_DIR } from '../constants/constans.js';
+import { TEMP_UPLOAD_DIR } from '../constants/constants.js';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -7,7 +7,7 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now();
-    cb(null, uniqueSuffix + '-' + file.originalname);
+    cb(null, `${uniqueSuffix}_${file.originalname}`);
   },
 });
 
