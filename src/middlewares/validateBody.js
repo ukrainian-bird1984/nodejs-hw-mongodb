@@ -1,13 +1,13 @@
 import createHttpError from 'http-errors';
 
-export const validationBody = (schema) => async (req, res, next) => {
+export const validateBody = (schema) => async (req, res, next) => {
   try {
     await schema.validateAsync(req.body, {
       abortEarly: false,
     });
     next();
   } catch (err) {
-    const error = createHttpError(400, 'Bad Request', {
+    const error = createHttpError(400, 'Bad request', {
       errors: err.details,
     });
     next(error);
